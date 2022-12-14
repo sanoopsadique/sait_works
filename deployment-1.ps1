@@ -18,7 +18,7 @@ $admin= Read-Host -Prompt "Enter the local admin email"
 #Input OU#
 $dept= Read-Host -Prompt "Enter the department name"
 
-$current_name = "SAIT"+ $asset
+$current_name = $env:computername
 $new_name = $dept+$asset
 $ou = $departments[$dept]
 $ou_path = 'OU='+$ou+',OU=Staff,OU=PCs,DC=ACDM,DC=DS,DC=SAIT,DC=CA'
@@ -37,7 +37,7 @@ if(($choice -eq 'y') -or ($choice -eq 'Y') -or ($choice -eq '')) {
         Write-Output 'Error: User not found in active directory'
     }
     else {
-        Add-LocalGroupMember -Group "Administrators" -Member $user -Verbose
+        Add-LocalGroupMember -Group "Administrators" -Member $user.SamAccountName -Verbose
     }
     
     #Renaming computer
