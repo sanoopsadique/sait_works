@@ -23,7 +23,7 @@ $current_name = $env:computername
 $new_name = $dept+$asset
 $ou = $departments[$dept]
 $ou_path = 'OU='+$ou+',OU=Staff,OU=PCs,DC=ACDM,DC=DS,DC=SAIT,DC=CA'
-$Credential = Get-Credential itdroplets\saitmgr
+
 #Confirm
 Write-Output '________________________________________________________'`r`n'Computer will be renamed from '$current_name' to '$new_name`r`n$admin' will be added as local administrator'`r`n'Device will be added to OU# '$ou
 Write-Output '________________________________________________________'
@@ -31,7 +31,8 @@ $choice= Read-Host -Prompt 'Do you want to continue? (y/n)[y]'
 if(($choice -eq 'y') -or ($choice -eq 'Y') -or ($choice -eq '')) {
     
     # Adding computer to OU
-    Get-ADComputer $current_name | Move-ADObject -TargetPath $ou_path -Verbose
+    $Credential = Get-Credential acdm\saitmgr
+    Get-ADComputer $current_name -Credential $Credential | Move-ADObject -TargetPath $ou_path -Verbose -Credential $Credential
 
     # Adding user to the local admin group
     $user = Get-AdUser -Filter {emailaddress -eq $admin} -Credential $Credential
