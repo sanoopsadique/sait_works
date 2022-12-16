@@ -3,9 +3,10 @@ import-module ActiveDirectory
 $choice = 'y'
 
 $departments = @{
-    IT = '036'
-    SAMP = '081'
-    Dev  = '220'
+    EXEC = '0'
+    0 = '0'
+    ITS  = '17'
+    17 = '17'
 }
 
 
@@ -22,6 +23,7 @@ $current_name = $env:computername
 $new_name = $dept+$asset
 $ou = $departments[$dept]
 $ou_path = 'OU='+$ou+',OU=Staff,OU=PCs,DC=ACDM,DC=DS,DC=SAIT,DC=CA'
+$Credential = Get-Credential itdroplets\saitmgr
 #Confirm
 Write-Output '________________________________________________________'`r`n'Computer will be renamed from '$current_name' to '$new_name`r`n$admin' will be added as local administrator'`r`n'Device will be added to OU# '$ou
 Write-Output '________________________________________________________'
@@ -32,7 +34,7 @@ if(($choice -eq 'y') -or ($choice -eq 'Y') -or ($choice -eq '')) {
     Get-ADComputer $current_name | Move-ADObject -TargetPath $ou_path -Verbose
 
     # Adding user to the local admin group
-    $user = Get-AdUser -Filter {emailaddress -eq $admin}
+    $user = Get-AdUser -Filter {emailaddress -eq $admin} -Credential $Credential
     if(!$user) { 
         Write-Output 'Error: User not found in active directory'
     }
@@ -41,7 +43,7 @@ if(($choice -eq 'y') -or ($choice -eq 'Y') -or ($choice -eq '')) {
     }
     
     #Renaming computer
-    Rename-Computer $new_name -Force -Verbose
+    Rename-Computer $new_name -Force -Verbose -DomainCredential $Credential
 
     #Restart
     $choice= Read-Host -Prompt "Do you want to restart now? (y/n)[y]"
